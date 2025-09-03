@@ -75,20 +75,26 @@ body {
 }
 
 .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Botões se ajustam */
-    gap: 15px; /* Espaçamento entre os botões */
+    display: flex; /* Alterado para flexbox para um layout mais fluído e não agrupado */
+    flex-wrap: wrap;
+    justify-content: center; /* Centraliza os itens */
+    gap: 20px; /* Espaçamento entre os botões */
     width: 95%;
-    max-width: 600px;
+    max-width: 700px;
     margin: 20px auto;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.05); /* Fundo sutil para o grid */
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     backdrop-filter: blur(8px);
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* -------------------------------------
+   * ESTILO DOS BOTÕES (ITENS DO MENU) *
+   * REDONDO, CORES ÚNICAS E EFEITOS *
+   -------------------------------------
+*/
 .grid-item {
     display: flex;
     flex-direction: column;
@@ -96,37 +102,62 @@ body {
     justify-content: center;
     text-decoration: none;
     color: white;
-    padding: 15px 10px;
-    border-radius: 15px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-image 0.5s ease;
-    background-image: linear-gradient(135deg, rgba(70, 0, 150, 0.8), rgba(0, 70, 150, 0.8)); /* Gradiente padrão */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 0.9em; /* Tamanho da fonte menor para se adaptar */
-    min-height: 80px; /* Altura mínima para os botões */
+    width: 100px; /* Largura fixa para tornar o botão quadrado */
+    height: 100px; /* Altura fixa para tornar o botão quadrado */
+    border-radius: 50%; /* Torna o botão um círculo perfeito */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    border: 2px solid transparent;
+    font-size: 0.9em;
 }
 
-/* Cores específicas para cada botão (ajuste conforme necessário) */
-.grid-item:nth-child(1) { background-image: linear-gradient(135deg, #FFC300, #FF5733); } /* Depósito */
-.grid-item:nth-child(2) { background-image: linear-gradient(135deg, #00C9FF, #92FE9D); } /* Saque */
-.grid-item:nth-child(3) { background-image: linear-gradient(135deg, #C70039, #900C3F); } /* Tarefa */
-.grid-item:nth-child(4) { background-image: linear-gradient(135deg, #8A2BE2, #A020F0); } /* Nível */
-.grid-item:nth-child(5) { background-image: linear-gradient(135deg, #FF69B4, #CD5C5C); } /* Equipa */
-.grid-item:nth-child(6) { background-image: linear-gradient(135deg, #4682B4, #5F9EA0); } /* Sobre */
-.grid-item:nth-child(7) { background-image: linear-gradient(135deg, #32CD32, #ADFF2F); } /* Perfil */
-.grid-item:nth-child(8) { background-image: linear-gradient(135deg, #FFD700, #FFA500); } /* Roleta da Sorte */
-
-
+/* Efeito de brilho ao passar o mouse */
 .grid-item:hover {
-    transform: translateY(-5px) scale(1.05); /* Efeito de elevação e zoom */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.4); /* Sombra mais intensa */
+    transform: translateY(-5px) scale(1.1); /* Efeito de elevação e zoom mais pronunciado */
+    border-color: #fff; /* Borda branca para destacar */
+    box-shadow: 0 0 20px var(--neon-color), 0 0 40px var(--neon-color); /* Efeito de neon */
 }
 
+/* Cores específicas para cada botão */
+.grid-item:nth-child(1) { 
+    background-color: #ff5733; /* Laranja */
+    --neon-color: #ff5733; 
+} 
+.grid-item:nth-child(2) { 
+    background-color: #33aaff; /* Azul claro */
+    --neon-color: #33aaff; 
+}
+.grid-item:nth-child(3) { 
+    background-color: #9933ff; /* Roxo */
+    --neon-color: #9933ff; 
+}
+.grid-item:nth-child(4) { 
+    background-color: #ff9933; /* Laranja pastel */
+    --neon-color: #ff9933; 
+}
+.grid-item:nth-child(5) { 
+    background-color: #33ff99; /* Verde-água */
+    --neon-color: #33ff99; 
+}
+.grid-item:nth-child(6) { 
+    background-color: #ffcc00; /* Amarelo */
+    --neon-color: #ffcc00; 
+}
+.grid-item:nth-child(7) { 
+    background-color: #cc33ff; /* Rosa/roxo */
+    --neon-color: #cc33ff; 
+}
+.grid-item:nth-child(8) { 
+    background-color: #3366ff; /* Azul escuro */
+    --neon-color: #3366ff; 
+}
+
+/* Ícones e texto dentro dos botões */
 .grid-item img {
-    width: 40px; /* Tamanho do ícone */
+    width: 40px;
     height: 40px;
     margin-bottom: 8px;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8)); /* Sombra para os ícones */
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.8));
 }
 
 .grid-item span {
@@ -134,6 +165,11 @@ body {
     text-transform: uppercase;
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
 }
+/* -------------------------------------
+   * FIM DO ESTILO DOS BOTÕES *
+   -------------------------------------
+*/
+
 
 .levels-container {
     width: 95%;
@@ -158,7 +194,7 @@ body {
 }
 
 .level-card {
-    background-image: linear-gradient(160deg, #1a2a6c, #b21f1f, #fdbb2d); /* Gradiente colorido */
+    background-image: linear-gradient(160deg, #1a2a6c, #b21f1f, #fdbb2d);
     color: white;
     padding: 20px;
     margin-bottom: 15px;
@@ -168,9 +204,9 @@ body {
     max-width: 400px;
     transition: transform 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    display: flex; /* Adicionado para layout flexível */
-    flex-direction: column; /* Conteúdo em coluna */
-    align-items: center; /* Centraliza itens */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .level-card:hover {
@@ -178,21 +214,20 @@ body {
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.6);
 }
 
-/* **IMAGENS DOS NÍVEIS - TAMANHO MENOR E ESTILO APRIMORADO** */
 .level-card-image, .level-card-image-placeholder {
-    width: 60px; /* Tamanho da imagem do nível - Reduzido de 80px */
-    height: 60px; /* Reduzido de 80px */
-    border-radius: 50%; /* Torna a imagem circular para um visual mais "bonito" */
-    object-fit: cover; /* Garante que a imagem preencha a área sem distorcer */
-    margin-bottom: 12px; /* Ajuste sutil no espaçamento */
-    border: 3px solid #ffd700; /* Borda dourada para destaque */
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8), inset 0 0 8px rgba(255, 215, 0, 0.3); /* Sombra mais vibrante */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 12px;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8), inset 0 0 8px rgba(255, 215, 0, 0.3);
 }
 
 .level-card h3 {
     margin-top: 0;
     font-size: 1.6em;
-    color: #ffd700; /* Dourado para o nome do nível */
+    color: #ffd700;
     text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
 }
 
@@ -202,7 +237,7 @@ body {
 }
 
 .level-card .buy-btn {
-    background-color: #28a745; /* Botão de compra verde */
+    background-color: #28a745;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -212,7 +247,7 @@ body {
     font-weight: bold;
     transition: background-color 0.3s ease, transform 0.2s ease;
     box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
-    margin-top: 10px; /* Espaçamento acima do botão */
+    margin-top: 10px;
 }
 
 .level-card .buy-btn:hover {
@@ -232,12 +267,12 @@ body {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Fundo um pouco mais escuro para contraste */
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: space-around;
     padding: 10px 0;
-    border-top: 2px solid rgba(255, 255, 255, 0.3); /* Linha divisória mais visível */
-    backdrop-filter: blur(8px); /* Blur mais intenso */
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(8px);
     z-index: 100;
 }
 
@@ -247,37 +282,36 @@ body {
     align-items: center;
     text-decoration: none;
     color: white;
-    font-size: 0.85em; /* Fonte ligeiramente maior */
+    font-size: 0.85em;
     transition: color 0.3s, transform 0.2s;
-    flex: 1; /* Distribui o espaço igualmente */
+    flex: 1;
 }
 
 .footer-item img {
-    width: 35px; /* Ícones um pouco maiores */
+    width: 35px;
     height: 35px;
     margin-bottom: 5px;
-    filter: drop-shadow(0 0 7px #fff); /* Sombra mais pronunciada */
+    filter: drop-shadow(0 0 7px #fff);
 }
 
 .footer-item:hover {
-    color: #ffeb3b; /* Cor de destaque ao passar o mouse */
-    transform: translateY(-3px); /* Efeito sutil de elevação */
+    color: #ffeb3b;
+    transform: translateY(-3px);
 }
 
 /* Responsividade para telas menores (ex: mobile) */
 @media (max-width: 600px) {
     .grid-container {
-        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* Ajusta para mobile */
-        gap: 10px;
+        gap: 15px; /* Ajuste o gap para mobile */
         padding: 15px;
     }
 
     .grid-item {
-        padding: 12px 8px;
+        width: 80px; /* Tamanho do botão em mobile */
+        height: 80px;
         font-size: 0.8em;
-        min-height: 70px;
     }
-
+    
     .grid-item img {
         width: 35px;
         height: 35px;
@@ -294,7 +328,7 @@ body {
     }
 
     .carousel-container {
-        height: 150px; /* Altura menor para mobile */
+        height: 150px;
         margin-top: 10px;
     }
 
