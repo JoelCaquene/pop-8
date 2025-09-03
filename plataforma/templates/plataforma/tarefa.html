@@ -6,116 +6,221 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Máquina - POP-8</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@400;600&display=swap');
+
+        :root {
+            --cor-fundo-primaria: #0a0f2b;
+            --cor-fundo-secundaria: #1e2c56;
+            --cor-destaque-azul: #00c6ff;
+            --cor-destaque-roxo: #9933ff;
+            --cor-texto-claro: #e0e0e0;
+            --cor-neon-verde: #00ff99;
+            --cor-neon-amarelo: #ffeb3b;
+            --cor-vermelho-alerta: #ff3366;
+        }
+
         body {
-            background-color: #0c0b2d;
-            background-image: url('{% static "plataforma/images/fundo_azul_raios.jpg" %}'); /* Use o caminho da sua imagem */
+            background: linear-gradient(135deg, var(--cor-fundo-primaria), var(--cor-fundo-secundaria));
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--cor-texto-claro);
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Altera para alinhar ao topo */
+            justify-content: flex-start;
             min-height: 100vh;
             text-align: center;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Efeito de estrelas no fundo */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('{% static "plataforma/images/estrelas.png" %}') repeat;
+            opacity: 0.3;
+            z-index: -1;
+            animation: moveStars 100s linear infinite;
+        }
+
+        @keyframes moveStars {
+            from { background-position: 0 0; }
+            to { background-position: 100% 100%; }
         }
 
         .header {
             width: 100%;
             padding: 20px;
-            color: #ffeb3b;
-            text-shadow: 0 0 5px #ffeb3b;
-            font-size: 1.5em;
+            color: var(--cor-destaque-azul);
+            text-shadow: 0 0 10px var(--cor-destaque-azul), 0 0 20px rgba(0, 198, 255, 0.5);
+            font-size: 2em;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
         }
 
         .machine-container {
             width: 90%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 25px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            padding: 20px;
-            margin-top: 40px; /* Aumenta a margem superior para subir a máquina */
+            max-width: 550px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            border: 2px solid var(--cor-destaque-azul);
+            box-shadow: 0 0 50px rgba(0, 198, 255, 0.5), inset 0 0 20px rgba(0, 198, 255, 0.2);
+            padding: 30px;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+            animation: machineEntrance 1s ease-out;
+        }
+
+        @keyframes machineEntrance {
+            from { opacity: 0; transform: scale(0.8) translateY(50px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .machine-header h2 {
-            margin: 0 0 10px;
-            font-size: 1.8em;
-            color: #ffeb3b;
-            text-shadow: 0 0 10px #ffeb3b;
-        }
-        
-        .panel-display {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #77ff77;
-            box-shadow: 0 0 10px #77ff77, inset 0 0 5px #77ff77;
-            padding: 15px;
-            border-radius: 10px;
-            width: 90%;
-            margin: 20px auto;
-        }
-
-        .panel-display p {
-            margin: 8px 0;
-            font-size: 1.1em;
-        }
-
-        #timer {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #00ff00;
-            text-shadow: 0 0 10px #00ff00;
-        }
-
-        #production-btn {
-            background-image: linear-gradient(to right, #ff416c, #ff4b2b);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 30px;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 0 0 15px;
+            font-size: 2.2em;
+            color: var(--cor-neon-amarelo);
+            text-shadow: 0 0 10px var(--cor-neon-amarelo), 0 0 20px rgba(255, 235, 59, 0.5);
+            font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
         }
 
-        #production-btn:disabled {
-            background: #555;
-            cursor: not-allowed;
-            box-shadow: none;
-            filter: grayscale(100%);
+        .machine-body {
+            background: linear-gradient(160deg, #1f2a4f, #0a0f2b);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(0, 198, 255, 0.3);
+            box-shadow: inset 0 0 20px rgba(0, 198, 255, 0.2), 0 0 30px rgba(0, 198, 255, 0.3);
+            position: relative;
+        }
+
+        /* Indicador de Status com luzes */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+
+        .status-light {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+
+        .status-light.ready {
+            background-color: var(--cor-neon-verde);
+            border-color: var(--cor-neon-verde);
+            box-shadow: 0 0 15px var(--cor-neon-verde), 0 0 30px rgba(0, 255, 153, 0.5);
+            animation: pulse-light 1.5s infinite alternate;
+        }
+        
+        .status-light.completed {
+            background-color: var(--cor-vermelho-alerta);
+            border-color: var(--cor-vermelho-alerta);
+            box-shadow: 0 0 15px var(--cor-vermelho-alerta), 0 0 30px rgba(255, 51, 102, 0.5);
+            opacity: 0.6;
+        }
+
+        @keyframes pulse-light {
+            from { transform: scale(1); opacity: 0.8; }
+            to { transform: scale(1.1); opacity: 1; }
+        }
+
+        .status-text {
+            font-size: 1.4em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        #production-btn {
+            background: linear-gradient(45deg, var(--cor-destaque-azul), var(--cor-destaque-roxo));
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 40px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+            text-transform: uppercase;
+            margin-top: 30px;
+            box-shadow: 0 8px 30px rgba(0, 198, 255, 0.6);
+            position: relative;
+            overflow: hidden;
         }
 
         #production-btn:hover:enabled {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px #ff416c;
+            transform: scale(1.07) translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 198, 255, 0.8), 0 0 50px rgba(153, 51, 255, 0.5);
+        }
+
+        #production-btn:disabled {
+            background: linear-gradient(45deg, #444, #222);
+            cursor: not-allowed;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            filter: grayscale(80%);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        #production-btn.completed {
+            background: linear-gradient(45deg, #666, #333);
+            color: #aaa;
         }
         
         .message {
-            margin-top: 15px;
-            font-size: 1em;
-            color: #ffeb3b;
+            margin-top: 25px;
+            font-size: 1.1em;
             font-weight: bold;
-            text-shadow: 0 0 5px #ffeb3b;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid;
+            display: none;
         }
 
+        .message.success {
+            color: var(--cor-neon-verde);
+            border-color: var(--cor-neon-verde);
+            text-shadow: 0 0 8px var(--cor-neon-verde);
+        }
+
+        .message.error {
+            color: var(--cor-vermelho-alerta);
+            border-color: var(--cor-vermelho-alerta);
+            text-shadow: 0 0 8px var(--cor-vermelho-alerta);
+        }
+
+        /* Footer de Navegação */
         .footer-nav {
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
-            border-top: 2px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
+            border-top: 2px solid var(--cor-destaque-azul);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            box-shadow: 0 -5px 20px rgba(0, 198, 255, 0.4);
         }
 
         .footer-item {
@@ -123,39 +228,42 @@
             flex-direction: column;
             align-items: center;
             text-decoration: none;
-            color: white;
-            font-size: 0.8em;
-            transition: color 0.3s;
+            color: var(--cor-texto-claro);
+            font-size: 0.9em;
+            transition: color 0.3s, transform 0.2s;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
         }
 
         .footer-item img {
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             margin-bottom: 5px;
-            filter: drop-shadow(0 0 5px #fff);
+            filter: drop-shadow(0 0 8px var(--cor-destaque-azul));
         }
 
         .footer-item:hover {
-            color: #ffeb3b;
+            color: var(--cor-destaque-azul);
+            transform: translateY(-5px);
+            text-shadow: 0 0 10px var(--cor-destaque-azul);
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Tarefa</h1>
+        <h1>Minha Máquina de Renda</h1>
     </div>
 
     <div class="machine-container">
         <div class="machine-header">
-            <h2>Máquina de Produção</h2>
+            <h2>Produção Diária</h2>
         </div>
         <div class="machine-body">
-            <div class="panel-display">
-                <p>Status: <span id="status">Pronta para produzir</span></p>
-                <p>Próxima Produção em:</p>
-                <p id="timer">--:--:--</p>
+            <div class="status-indicator">
+                <div class="status-light" id="status-light"></div>
+                <span class="status-text" id="status-text">Verificando...</span>
             </div>
-            <button id="production-btn">Produção</button>
+
+            <button id="production-btn">Receber Ganhos</button>
             <div class="message" id="info-message"></div>
         </div>
     </div>
@@ -185,81 +293,90 @@
 
     <script>
         const productionBtn = document.getElementById('production-btn');
-        const timerDisplay = document.getElementById('timer');
-        const statusDisplay = document.getElementById('status');
+        const statusLight = document.getElementById('status-light');
+        const statusText = document.getElementById('status-text');
         const infoMessage = document.getElementById('info-message');
 
-        const cooldownTime = 24 * 60 * 60 * 1000; // 24 horas em milissegundos
-        let lastProductionTime = localStorage.getItem('lastProductionTime') || 0;
-        
-        // Esta variável deve ser passada do backend (Django)
-        // Certifique-se de que sua view passe 'has_level' para o template
-        let hasLevel = {{ has_level|yesno:"true,false" }}; 
+        // Essas variáveis DEvem ser passadas do backend Django
+        // `user_has_active_level` deve ser True se o cliente tem um depósito aprovado E um nível em aluguel ativo
+        // `task_completed_today` deve ser True se a tarefa já foi realizada hoje
+        let userHasActiveLevel = {{ user_has_active_level|yesno:"true,false" }};
+        let taskCompletedToday = {{ task_completed_today|yesno:"true,false" }};
 
         function updateUI() {
-            if (!hasLevel) {
-                productionBtn.disabled = true;
+            if (!userHasActiveLevel) {
+                // Caso o cliente não tenha um nível ativo
+                statusLight.className = 'status-light completed';
+                statusText.textContent = "Nível Inativo";
                 infoMessage.textContent = "Você precisa alugar um nível para usar a máquina.";
-                statusDisplay.textContent = "Inativa";
-                timerDisplay.textContent = "--:--:--";
-                return;
-            }
-            
-            infoMessage.textContent = "";
-            const currentTime = new Date().getTime();
-            const elapsedTime = currentTime - lastProductionTime;
-            const remainingTime = cooldownTime - elapsedTime;
-
-            if (remainingTime <= 0) {
-                timerDisplay.textContent = "00:00:00";
-                productionBtn.disabled = false;
-                statusDisplay.textContent = "Pronta para produzir";
-                productionBtn.textContent = "Produção";
-            } else {
-                const hours = Math.floor(remainingTime / (1000 * 60 * 60));
-                const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-
-                const formatTime = (time) => String(time).padStart(2, '0');
-
-                timerDisplay.textContent = `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`;
+                infoMessage.className = 'message error';
+                infoMessage.style.display = 'block';
                 productionBtn.disabled = true;
-                statusDisplay.textContent = "Em produção...";
-                productionBtn.textContent = "Produzindo...";
+                productionBtn.textContent = "Nível Inativo";
+                productionBtn.classList.add('completed');
+            } else if (taskCompletedToday) {
+                // Caso a tarefa já tenha sido realizada hoje
+                statusLight.className = 'status-light completed';
+                statusText.textContent = "Tarefa Concluída";
+                infoMessage.textContent = "Ganhos diários já recebidos hoje.";
+                infoMessage.className = 'message success';
+                infoMessage.style.display = 'block';
+                productionBtn.disabled = true;
+                productionBtn.textContent = "Ganhos Recebidos";
+                productionBtn.classList.add('completed');
+            } else {
+                // Caso a tarefa esteja pronta para ser realizada
+                statusLight.className = 'status-light ready';
+                statusText.textContent = "Pronta para Receber";
+                infoMessage.style.display = 'none';
+                productionBtn.disabled = false;
+                productionBtn.textContent = "Receber Ganhos";
+                productionBtn.classList.remove('completed');
             }
         }
 
         productionBtn.addEventListener('click', async () => {
-            if (!hasLevel) {
-                infoMessage.textContent = "Você precisa alugar um nível para usar a máquina.";
+            if (productionBtn.disabled) {
                 return;
             }
 
+            // Desabilita o botão e muda o texto
+            productionBtn.disabled = true;
+            productionBtn.textContent = "Processando...";
+            infoMessage.style.display = 'none';
+
             try {
-                const response = await fetch('/realizar-tarefa/', { 
+                const response = await fetch('/realizar-tarefa/', {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': '{{ csrf_token }}',
-                    }
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
                 });
+
                 const data = await response.json();
 
-                if (data.status === 'success') {
-                    // Simula a lógica do backend.
-                    lastProductionTime = new Date().getTime();
-                    localStorage.setItem('lastProductionTime', lastProductionTime);
-                    infoMessage.textContent = "Tarefa realizada! Renda diária adicionada.";
+                if (response.ok && data.status === 'success') {
+                    // Atualiza o estado da tarefa para "concluída" se a resposta do backend for positiva
+                    taskCompletedToday = true;
+                    infoMessage.textContent = `Ganhos diários de ${data.ganho_diario} Kz adicionados!`;
+                    infoMessage.className = 'message success';
                 } else {
-                    infoMessage.textContent = data.message;
+                    infoMessage.textContent = data.message || "Erro desconhecido. Tente novamente.";
+                    infoMessage.className = 'message error';
                 }
             } catch (error) {
-                infoMessage.textContent = "Erro ao realizar a tarefa. Tente novamente.";
+                console.error('Erro na requisição:', error);
+                infoMessage.textContent = "Erro de conexão. Verifique sua internet.";
+                infoMessage.className = 'message error';
+            } finally {
+                infoMessage.style.display = 'block';
+                updateUI(); // Atualiza a UI com o novo estado
             }
-            
-            updateUI();
         });
 
-        setInterval(updateUI, 1000);
+        // Chama updateUI uma vez ao carregar a página para definir o estado inicial
         updateUI();
     </script>
 </body>

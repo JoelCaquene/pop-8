@@ -153,7 +153,8 @@ class NivelAlugado(models.Model):
     data_inicio = models.DateTimeField(default=timezone.now, verbose_name="Data de Início")
     data_expiracao = models.DateTimeField(verbose_name="Data de Expiração")
     is_active = models.BooleanField(default=True, verbose_name="Está Ativo?")
-    ultima_tarefa = models.DateTimeField(null=True, blank=True, verbose_name="Última Tarefa Realizada")
+    
+    # Campo `ultima_tarefa` removido do NivelAlugado e movido para o modelo Tarefa
 
     class Meta:
         verbose_name = "Nível Alugado"
@@ -197,18 +198,28 @@ class Renda(models.Model):
     def __str__(self):
         return f"Renda de {self.usuario.phone_number}"
 
-# Modelo para Tarefas
+# --- INÍCIO DA ALTERAÇÃO NA LÓGICA DA TAREFA ---
+
 class Tarefa(models.Model):
+    """
+    Modelo para registrar a realização diária da tarefa por um usuário.
+    Cada instância representa uma tarefa diária concluída.
+    """
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='tarefas_realizadas', verbose_name="Usuário")
-    data_realizacao = models.DateTimeField(default=timezone.now, verbose_name="Data de Realização")
+    # O campo 'data' agora é um DateField para garantir que só haja uma entrada por dia
+    data = models.DateField(default=timezone.now, verbose_name="Data de Realização")
     ganho = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ganho da Tarefa (Kz)")
 
     class Meta:
         verbose_name = "Tarefa Realizada"
         verbose_name_plural = "Tarefas Realizadas"
+        # Garante que um usuário só possa ter uma tarefa por dia
+        unique_together = ('usuario', 'data')
 
     def __str__(self):
-        return f"Tarefa de {self.usuario.phone_number} - {self.ganho} Kz"
+        return f"Tarefa de {self.usuario.phone_number} em {self.data} - {self.ganho} Kz"
+
+# --- FIM DA ALTERAÇÃO NA LÓGICA DA TAREFA ---
 
 # NOVO Modelo para Prêmios de Subsídio (substitui RoletaPremio)
 class PremioSubsidio(models.Model):
@@ -235,3 +246,4 @@ class Sobre(models.Model):
 
     def __str__(self):
         return "Conteúdo da Página 'Sobre' da Plataforma"
+        

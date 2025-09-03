@@ -8,17 +8,17 @@ import json
 import uuid
 from django.db import models, transaction # Importar transaction para atomicidade
 from .models import (
-    Config, Usuario, Nivel, PlatformBankDetails, Deposito, 
+    Config, Usuario, Nivel, PlatformBankDetails, Deposito,
     ClientBankDetails, NivelAlugado, Saque, Renda, Tarefa, PremioSubsidio, Sobre
 )
-from .forms import UsuarioUpdateForm, ClientBankDetailsForm 
+from .forms import UsuarioUpdateForm, ClientBankDetailsForm
 from django.db import IntegrityError
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from django.utils import timezone
 import pytz
 import random
 from decimal import Decimal
-from django.contrib.auth.forms import PasswordChangeForm 
+from django.contrib.auth.forms import PasswordChangeForm
 
 def cadastro_view(request):
     config = Config.objects.first()
@@ -28,7 +28,7 @@ def cadastro_view(request):
         phone_number = request.POST.get('phone_number')
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
-        invitation_code_provided = request.POST.get('invitation_code') 
+        invitation_code_provided = request.POST.get('invitation_code')
 
         if not all([phone_number, password, password_confirm]):
             messages.error(request, 'Por favor, preencha todos os campos.')
@@ -66,16 +66,16 @@ def cadastro_view(request):
                         break
 
                 user = Usuario.objects.create_user(
-                    phone_number=phone_number, 
-                    password=password, 
-                    invitation_code=new_user_invitation_code, 
-                    inviter=inviter_user 
+                    phone_number=phone_number,
+                    password=password,
+                    invitation_code=new_user_invitation_code,
+                    inviter=inviter_user
                 )
                 # O UsuarioManager.create_user já chama Renda.objects.create(usuario=user)
                 # Se create_user for bem-sucedido, tanto o usuário quanto o seu objeto Renda são criados.
                 
                 # Atualizar o username (se necessário, embora phone_number já seja único)
-                user.username = phone_number 
+                user.username = phone_number
                 user.save() # Guardar quaisquer alterações no objeto usuário (como o username)
 
             # Se chegarmos aqui, o usuário e a Renda foram criados com sucesso
@@ -122,7 +122,7 @@ def logout_view(request):
 
 @login_required
 def menu_view(request):
-    niveis = Nivel.objects.all() 
+    niveis = Nivel.objects.all()
     config = Config.objects.first() # Obtém o objeto de configuração
     context = {
         'niveis': niveis,
@@ -145,14 +145,14 @@ def deposito_view(request):
                 comprovante = request.FILES['proof']
                 
                 # Usar Decimal para valores monetários para evitar problemas de precisão
-                valor_deposito = Decimal(valor_deposito_str) 
+                valor_deposito = Decimal(valor_deposito_str)
 
                 # Status inicial do depósito deve ser 'Pendente'
                 novo_deposito = Deposito.objects.create(
                     usuario=request.user,
                     valor=valor_deposito,
                     comprovativo_imagem=comprovante,
-                    status='Pendente' 
+                    status='Pendente'
                 )
                 
                 messages.success(request, 'Comprovante enviado com sucesso! Aguarde a aprovação do administrador.')
@@ -160,7 +160,7 @@ def deposito_view(request):
                 
             except Exception as e:
                 messages.error(request, f'Ocorreu um erro ao enviar o comprovante: {e}')
-                return redirect('deposito') 
+                return redirect('deposito')
         else:
             valor_deposito = request.POST.get('amount')
             banco_nome = request.POST.get('method')
@@ -330,51 +330,78 @@ def saque_view(request):
     }
     return render(request, 'plataforma/saque.html', context)
 
+# --- INÍCIO DA ALTERAÇÃO NA LÓGICA DA TAREFA ---
+
 @login_required
 def tarefa_view(request):
+    """
+    Renderiza a página de tarefa.
+    Adicionada a lógica para passar o estado da tarefa para o frontend.
+    """
     usuario = request.user
-    niveis_alugados_ativos = NivelAlugado.objects.filter(usuario=usuario, is_active=True)
-    has_level = niveis_alugados_ativos.exists()
     
+    # Verifica se o usuário tem algum nível alugado ativo
+    user_has_active_level = NivelAlugado.objects.filter(usuario=usuario, is_active=True).exists()
+
+    # Verifica se a tarefa já foi realizada hoje
+    luanda_tz = pytz.timezone('Africa/Luanda')
+    hoje_luanda = timezone.now().astimezone(luanda_tz).date()
+    
+    task_completed_today = Tarefa.objects.filter(
+        usuario=usuario,
+        data__date=hoje_luanda
+    ).exists()
+
     context = {
-        'has_level': has_level
+        'user_has_active_level': user_has_active_level,
+        'task_completed_today': task_completed_today,
     }
     return render(request, 'plataforma/tarefa.html', context)
 
 @login_required
 @require_POST
 def realizar_tarefa(request):
+    """
+    Processa a solicitação de realização da tarefa.
+    A lógica é alterada para permitir uma única tarefa por dia.
+    """
     usuario = request.user
     
+    # Verificação de segurança crucial: a tarefa só pode ser realizada se o usuário tiver um nível ativo.
     niveis_alugados_ativos = NivelAlugado.objects.filter(usuario=usuario, is_active=True)
-
     if not niveis_alugados_ativos.exists():
         return JsonResponse({'status': 'error', 'message': 'Você não tem um nível ativo para realizar a tarefa.'}, status=403)
 
-    agora = timezone.now()
-    total_ganho_tarefas = Decimal('0.00')
+    # Verifica se a tarefa já foi realizada hoje
+    luanda_tz = pytz.timezone('Africa/Luanda')
+    hoje_luanda = timezone.now().astimezone(luanda_tz).date()
 
-    for nivel_alugado in niveis_alugados_ativos:
-        if nivel_alugado.ultima_tarefa and (agora - nivel_alugado.ultima_tarefa) < timedelta(hours=24):
-            continue 
-        
-        try:
-            renda_diaria = nivel_alugado.nivel.ganho_diario
-            usuario.saldo_disponivel += renda_diaria
-            nivel_alugado.ultima_tarefa = agora
-            nivel_alugado.save()
-            total_ganho_tarefas += renda_diaria
+    if Tarefa.objects.filter(usuario=usuario, data__date=hoje_luanda).exists():
+        return JsonResponse({'status': 'info', 'message': 'A tarefa diária já foi realizada hoje.'}, status=400)
 
-        except Exception as e:
-            print(f"Erro ao processar tarefa para nível {nivel_alugado.nivel.nome_nivel}: {e}")
-            return JsonResponse({'status': 'error', 'message': f'Ocorreu um erro interno ao processar um dos níveis: {e}'}, status=500)
+    # Lógica para adicionar ganhos ao saldo do usuário
+    total_ganho_diario = Decimal('0.00')
 
-    usuario.save()
-    
-    if total_ganho_tarefas > 0:
-        return JsonResponse({'status': 'success', 'message': f'Renda diária total de {total_ganho_tarefas:.2f} Kz adicionada com sucesso.'})
-    else:
-        return JsonResponse({'status': 'info', 'message': 'Todas as tarefas já foram realizadas nas últimas 24 horas ou você não tem níveis ativos para tarefas.'})
+    with transaction.atomic():
+        # Itera sobre todos os níveis alugados ativos para somar os ganhos diários
+        for nivel_alugado in niveis_alugados_ativos:
+            total_ganho_diario += nivel_alugado.nivel.ganho_diario
+
+        # Credita o total de ganhos no saldo disponível do usuário
+        usuario.saldo_disponivel += total_ganho_diario
+        usuario.save()
+
+        # Registra a conclusão da tarefa para o dia de hoje
+        Tarefa.objects.create(usuario=usuario, data=timezone.now(), ganho=total_ganho_diario)
+
+    # Retorna uma resposta de sucesso
+    return JsonResponse({
+        'status': 'success',
+        'message': f'Renda diária de {total_ganho_diario:.2f} Kz adicionada com sucesso.',
+        'ganho_diario': float(total_ganho_diario) # Retorna o valor como float para o JavaScript
+    })
+
+# --- FIM DA ALTERAÇÃO NA LÓGICA DA TAREFA ---
 
 @login_required
 def nivel_view(request):
@@ -428,14 +455,14 @@ def equipa_view(request):
     # CORREÇÃO CRÍTICA AQUI: Usar o invitation_code do usuario_logado
     link_convite = request.build_absolute_uri(f'/cadastro/?convite={usuario_logado.invitation_code}')
     
-    membros_equipa = Usuario.objects.filter(inviter=usuario_logado) 
+    membros_equipa = Usuario.objects.filter(inviter=usuario_logado)
     
     lista_membros = []
     for membro in membros_equipa:
         tem_nivel_ativo = NivelAlugado.objects.filter(usuario=membro, is_active=True).exists()
         
         lista_membros.append({
-            'nome': membro.username if membro.username else membro.phone_number, 
+            'nome': membro.username if membro.username else membro.phone_number,
             'numero': membro.phone_number,
             'tem_nivel_ativo': tem_nivel_ativo
         })
@@ -560,7 +587,7 @@ def abrir_premio(request):
             premio_ganho = random.choice(premios)
 
         usuario.saldo_disponivel += premio_ganho.valor
-        usuario.saldo_subsidio += premio_ganho.valor 
+        usuario.saldo_subsidio += premio_ganho.valor
         
         usuario.spins_remaining -= 1
         usuario.save()
@@ -591,7 +618,7 @@ def renda_view(request):
     
     niveis_alugados = NivelAlugado.objects.filter(usuario=usuario, is_active=True).order_by('-data_inicio')
     if niveis_alugados.exists():
-        nivel_cliente = niveis_alugados.first().nivel.nome_nivel 
+        nivel_cliente = niveis_alugados.first().nivel.nome_nivel
     else:
         nivel_cliente = "Nível Básico (Sem nível alugado)"
 
@@ -605,3 +632,4 @@ def renda_view(request):
         'total_sacado': usuario.total_sacado,
     }
     return render(request, 'plataforma/renda.html', context)
+    

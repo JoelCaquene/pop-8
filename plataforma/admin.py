@@ -8,6 +8,8 @@ from .models import (
     Sobre
 )
 from .views import aprovar_deposito_com_subsidio # Importa a função do views.py
+from django.utils.html import format_html
+
 
 # Customização do Admin para o modelo Usuario
 class UsuarioAdmin(BaseUserAdmin):
@@ -27,7 +29,7 @@ class UsuarioAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('phone_number', 'password')}),
         ('Informações Pessoais', {'fields': ('username', 'invitation_code', 'inviter')}),
-        ('Saldos', {'fields': ('saldo', 'saldo_disponivel', 'saldo_subsidio', 'total_sacado')}),
+        ('Saldos', {'fields': ('saldo_disponivel', 'saldo_subsidio', 'total_sacado')}),
         ('Permissões', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Controle de Prêmios de Subsídio', {'fields': ('can_spin_roulette', 'spins_remaining', 'last_spin_reset')}),
         ('Datas Importantes', {'fields': ('last_login', 'date_joined')}),
@@ -86,7 +88,6 @@ class DepositoAdmin(admin.ModelAdmin):
     # Função para exibir o link da imagem do comprovativo
     def link_comprovativo(self, obj):
         if obj.comprovativo_imagem:
-            from django.utils.html import format_html
             return format_html('<a href="{}" target="_blank">Ver Comprovativo</a>', obj.comprovativo_imagem.url)
         return "Sem Comprovativo"
     link_comprovativo.short_description = "Comprovativo"
@@ -100,7 +101,8 @@ class ClientBankDetailsAdmin(admin.ModelAdmin):
 
 @admin.register(NivelAlugado)
 class NivelAlugadoAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'nivel', 'data_inicio', 'data_expiracao', 'is_active', 'ultima_tarefa')
+    # 'ultima_tarefa' foi removida porque não é um campo do modelo NivelAlugado
+    list_display = ('usuario', 'nivel', 'data_inicio', 'data_expiracao', 'is_active')
     list_filter = ('is_active', 'nivel')
     search_fields = ('usuario__phone_number', 'nivel__nome_nivel')
     raw_id_fields = ('usuario', 'nivel')
@@ -120,8 +122,9 @@ class RendaAdmin(admin.ModelAdmin):
 
 @admin.register(Tarefa)
 class TarefaAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'ganho', 'data_realizacao')
-    list_filter = ('data_realizacao',)
+    # 'data_realizacao' foi substituída por 'data', que é o nome do campo no modelo
+    list_display = ('usuario', 'ganho', 'data')
+    list_filter = ('data',)
     search_fields = ('usuario__phone_number',)
     raw_id_fields = ('usuario',)
 
@@ -134,3 +137,4 @@ class PremioSubsidioAdmin(admin.ModelAdmin):
 @admin.register(Sobre)
 class SobreAdmin(admin.ModelAdmin):
     list_display = ('ultima_atualizacao',)
+    

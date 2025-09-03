@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-import dotenv # Importar dotenv
-dotenv.load_dotenv() # Carregar variáveis de ambiente do ficheiro .env
+import dotenv
+dotenv.load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,18 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Sempre obtenha a SECRET_KEY de uma variável de ambiente em produção!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-q+)rh&425aq#(5#2l+7_(dpu&jwj6i&q2kfe_*!v!(o4t+#m3u')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Mude para False em produção!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
-# Domínios permitidos para acessar sua aplicação
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.onrender.com'] # Adicione seu domínio do Render.com aqui, ex: 'ssd-plataforma.onrender.com'
-# Se você tiver um domínio personalizado, adicione-o aqui também.
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.onrender.com']
 
-# Aplicações adicionadas e apps para Cloudinary e WhiteNoise
+# --- INÍCIO DAS MUDANÇAS ---
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,18 +40,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # Suas aplicações
-    'plataforma', 
+    # Sua aplicação agora é 'plataforma'
+    'plataforma.apps.PlataformaConfig', # <-- **CORRIGIDO**
+    # Use o nome da sua classe de configuração do arquivo apps.py
 
     # Apps de terceiros para deploy
-    'cloudinary_storage', # Para gerenciar arquivos de mídia no Cloudinary
-    'cloudinary',         # Integração com Cloudinary
-    'whitenoise.runserver_nostatic', # Para servir arquivos estáticos em dev com WhiteNoise
+    'cloudinary_storage',
+    'cloudinary',
+    'whitenoise.runserver_nostatic',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # WhiteNoise deve vir logo após SecurityMiddleware em produção
     'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,7 +61,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'pop-8.urls'
+# A URL base e o WSGI agora apontam para o seu projeto principal.
+# Supondo que o nome da pasta do seu projeto principal é 'pop_8',
+# o nome do módulo é 'pop_8'. Se for 'core', corrija para 'core'.
+ROOT_URLCONF = 'pop_8.urls'
+WSGI_APPLICATION = 'pop_8.wsgi.application'
+
+# --- FIM DAS MUDANÇAS ---
 
 TEMPLATES = [
     {
@@ -73,7 +76,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug', # Adicionado debug para dev
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -82,29 +85,20 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'pop-8.wsgi.application'
-
 
 # Database
-# Use PostgreSQL em produção (Render.com oferece isso)
-# Para desenvolvimento local, pode manter SQLite.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-# Configuração de Banco de Dados para Produção (Render.com)
-# Render.com injeta uma variável de ambiente DATABASE_URL.
-# Você precisará instalar 'dj-database-url' para usá-lo.
-if not DEBUG: # <--- ESTE BLOCO AGORA ESTÁ DESCOMENTADO!
+if not DEBUG:
     import dj_database_url
     DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -122,47 +116,29 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
-LANGUAGE_CODE = 'pt-br' # Alterado para português do Brasil
-TIME_ZONE = 'Africa/Luanda' # Definido para o fuso horário de Luanda
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'Africa/Luanda'
 USE_I18N = True
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles' # Onde collectstatic vai coletar todos os arquivos estáticos
-
-# O STATICFILES_DIRS não é estritamente necessário se todos os seus estáticos estão em 'static/' dentro das apps
-# e você está usando Cloudinary para todos os estáticos. Se não, pode ser útil.
-# STATICFILES_DIRS = [
-#       BASE_DIR / "plataforma" / "static", # Exemplo se tiver estáticos globais na sua app
-# ]
-
-# Configuração do Cloudinary para arquivos de mídia e estáticos
-CLOUDINARY_URL = os.getenv('CLOUDINARY_URL') # Puxa do .env ou ambiente de produção
-
-# Armazenamento padrão para arquivos de mídia (uploads de usuários)
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-# Armazenamento para arquivos estáticos (CSS, JS, etc.) em produção
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticCloudinaryStorage'
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+# Cloudinary configurations
+CLOUDINARY_URL = os.getenv('CLOUDINARY_URL')
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Modelos de Autenticação
+# Authentication models
 AUTH_USER_MODEL = 'plataforma.Usuario'
-
-# URL para onde o Django redireciona para o login
 LOGIN_URL = 'login'
 
-# Para segurança CSRF em produção, especialmente com domínios personalizados
+# CSRF security
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com', 'https://*.cloud.cloudinary.com']
-# Adicione outros domínios personalizados se usar.
