@@ -1,5 +1,5 @@
 """
-WSGI config for pop-8 project.
+WSGI config for pop_8 project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pop-8.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pop_8.settings')
 
 application = get_wsgi_application()
