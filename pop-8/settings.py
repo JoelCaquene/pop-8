@@ -36,50 +36,50 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.onrender.com'] # Adicione seu domí
 
 # Aplicações adicionadas e apps para Cloudinary e WhiteNoise
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    
-    # Suas aplicações
-    'plataforma', 
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    
+    # Suas aplicações
+    'plataforma', 
 
-    # Apps de terceiros para deploy
-    'cloudinary_storage', # Para gerenciar arquivos de mídia no Cloudinary
-    'cloudinary',         # Integração com Cloudinary
-    'whitenoise.runserver_nostatic', # Para servir arquivos estáticos em dev com WhiteNoise
+    # Apps de terceiros para deploy
+    'cloudinary_storage', # Para gerenciar arquivos de mídia no Cloudinary
+    'cloudinary',         # Integração com Cloudinary
+    'whitenoise.runserver_nostatic', # Para servir arquivos estáticos em dev com WhiteNoise
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    # WhiteNoise deve vir logo após SecurityMiddleware em produção
-    'whitenoise.middleware.WhiteNoiseMiddleware', 
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise deve vir logo após SecurityMiddleware em produção
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'pop-8.urls'
 
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug', # Adicionado debug para dev
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug', # Adicionado debug para dev
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
 ]
 
 WSGI_APPLICATION = 'pop-8.wsgi.application'
@@ -89,35 +89,35 @@ WSGI_APPLICATION = 'pop-8.wsgi.application'
 # Use PostgreSQL em produção (Render.com oferece isso)
 # Para desenvolvimento local, pode manter SQLite.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 # Configuração de Banco de Dados para Produção (Render.com)
 # Render.com injeta uma variável de ambiente DATABASE_URL.
 # Você precisará instalar 'dj-database-url' para usá-lo.
 if not DEBUG: # <--- ESTE BLOCO AGORA ESTÁ DESCOMENTADO!
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+    import dj_database_url
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 
@@ -139,7 +139,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles' # Onde collectstatic vai coletar todos os
 # O STATICFILES_DIRS não é estritamente necessário se todos os seus estáticos estão em 'static/' dentro das apps
 # e você está usando Cloudinary para todos os estáticos. Se não, pode ser útil.
 # STATICFILES_DIRS = [
-#     BASE_DIR / "plataforma" / "static", # Exemplo se tiver estáticos globais na sua app
+#       BASE_DIR / "plataforma" / "static", # Exemplo se tiver estáticos globais na sua app
 # ]
 
 # Configuração do Cloudinary para arquivos de mídia e estáticos
